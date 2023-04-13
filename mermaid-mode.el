@@ -133,6 +133,12 @@ STR is the declaration."
           (cons (- l (line-number-at-pos)) (current-indentation))
         (cons -1 -1)))))
 
+(defcustom mermaid-indent-offset 2
+  "*Amount of offset per level of indentation."
+  :type 'integer
+  :safe 'natnump
+  :group 'mermaid-mode)
+
 (defun mermaid--calculate-desired-indentation ()
   "Determine the indentation level that this line should have."
   (save-excursion
@@ -144,11 +150,11 @@ STR is the declaration."
           (end (mermaid--locate-declaration "^ *end *$")))
       (cond ((equal (car graph) 0) 0) ;; this is a graph declaration
             ((equal (car end) 0) (cdr subgraph)) ;; this is "end", indent to nearest subgraph
-            ((equal (car subgraph) 0) (+ 4 (cdr graph))) ;; this is a subgraph
+            ((equal (car subgraph) 0) (+ mermaid-indent-offset (cdr graph))) ;; this is a subgraph
             ((equal (car else) 0) (cdr subgraph)) ;; this is "else:, indent to nearest alt
             ;; everything else
-            ((< (car end) 0) (+ 4 (cdr both))) ;; no end in sight
-            ((< (car both) (car end)) (+ 4 (cdr both))) ;; (sub)graph declaration closer, +4
+            ((< (car end) 0) (+ mermaid-indent-offset (cdr both))) ;; no end in sight
+            ((< (car both) (car end)) (+ mermaid-indent-offset (cdr both))) ;; (sub)graph declaration closer, +mermaid-indent-offset
             (t (cdr end)) ;; end declaration closer, same indent
             ))))
 
