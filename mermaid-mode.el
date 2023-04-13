@@ -54,7 +54,6 @@
 ;;; Code:
 
 (require 'browse-url)
-(require 'ob)
 (require 'ob-eval)
 
 (defgroup mermaid-mode nil
@@ -99,8 +98,12 @@
   '((:results . "file") (:exports . "results"))
   "Default arguments for evaluating a mermaid source block.")
 
+(declare-function org-babel-temp-file "ext:ob-core")
+(declare-function org-babel-process-file-name "ext:ob-core")
+
 (defun org-babel-execute:mermaid (body params)
   "Execute command with BODY and PARAMS from src block."
+  (require 'ob)
   (let* ((out-file (or (cdr (assoc :file params))
                        (error "Mermaid requires a \":file\" header argument")))
          (temp-file (org-babel-temp-file "mermaid-"))
@@ -175,7 +178,7 @@ STR is the declaration."
       (mermaid-compile-file tmp-file-name))))
 
 (defun mermaid-compile-file (file-name)
-  "Compile the given mermaid file using mmdc."
+  "Compile the given mermaid FILE-NAME using mmdc."
   (interactive "fFilename: ")
   (let* ((input file-name)
          (output (concat (file-name-sans-extension input) mermaid-output-format))
